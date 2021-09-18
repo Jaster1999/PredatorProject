@@ -24,11 +24,17 @@ def main():
     print(sequence)
     mean_frame = np.mean(sequence, axis=0).astype(np.uint8)
     plt.imshow(mean_frame, cmap="gray")
-    plt.show()
     print(mean_frame.shape)
-    mask = diff_mask(mean_frame, sequence[10], 10)
+    mask = (diff_mask(mean_frame, sequence[10], 20)*255).astype(np.uint8)
+
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(5,5))
+    opening = cv2.morphologyEx(mask,cv2.MORPH_OPEN,kernel, iterations = 2)
+    closing = cv2.morphologyEx(opening,cv2.MORPH_CLOSE,kernel, iterations = 4)
+
     plt.figure()
-    plt.imshow(mask)
+    plt.imshow(opening)
+    plt.figure()
+    plt.imshow(sequence[10], cmap='gray')
     plt.show()
     
 
