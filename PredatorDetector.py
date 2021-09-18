@@ -11,9 +11,9 @@ def load_images_from_folder(folder):
         if img is not None:
             images.append(img)
     return images
+    
 def diff_mask(img1, img2, threshold):
     diff = cv.absdiff(img1, img2)
-    print(diff)
     mask = diff>threshold
     return mask
 
