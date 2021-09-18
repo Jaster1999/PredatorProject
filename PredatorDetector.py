@@ -25,36 +25,37 @@ def diff_mask(img1, img2, threshold):
 def main():
     CWD = os.getcwd()
     folderOfSeq = 'Video sequences for project-20210918'
-    seq = 'seq7'
-    sequence = load_images_from_folder(os.path.join(CWD, folderOfSeq, seq))
-    mean_frame = np.mean(sequence[0:10], axis=0).astype(np.uint8)
-    for imagenumber in range(len(sequence)):
-        # if imagenumber < 5:
-        #     mean_frame = np.mean(sequence[0:5], axis=0).astype(np.uint8)
-        # else:
-        #     mean_frame = np.mean(sequence[imagenumber-5:imagenumber], axis=0).astype(np.uint8)
-        thresholdValue = 10
-        img = sequence[imagenumber]
-        mask = diff_mask(mean_frame, img, thresholdValue)
-        kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE,(5,5))
-        opening = cv.morphologyEx(mask,cv.MORPH_OPEN,kernel, iterations = 2)
-        closing = cv.morphologyEx(opening,cv.MORPH_CLOSE,kernel, iterations = 4)
-        contours, hierachy = cv.findContours(closing, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
-        # Find the index of the largest contour
-        areas = [cv.contourArea(c) for c in contours]
-        max_index = np.argmax(areas)
-        cnt=contours[max_index]
-        # print(cv.contourArea(cnt))
-        if cv.contourArea(cnt) > 500:
-
-            x,y,w,h = cv.boundingRect(cnt)
-            cv.rectangle(img,(x,y),(x+w,y+h),0,2)
-        cv.imshow("closed mask", closing)
-        cv.waitKey(1)
-        cv.imshow("image", img)
-        cv.waitKey(1)
-        time.sleep(0.5)
-    cv.destroyAllWindows()
+    folders = ['Seq1','Seq2','Seq3','Seq4','Seq5','Seq6','Seq7']
+    for seq in folders:
+        print(seq)
+    # seq = 'Seq7'
+        sequence = load_images_from_folder(os.path.join(CWD, folderOfSeq, seq))
+        mean_frame = np.mean(sequence[0:10], axis=0).astype(np.uint8)
+        for imagenumber in range(len(sequence)):
+            thresholdValue = 10
+            img = sequence[imagenumber]
+            mask = diff_mask(mean_frame, img, thresholdValue)
+            kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE,(5,5))
+            opening = cv.morphologyEx(mask,cv.MORPH_OPEN,kernel, iterations = 2)
+            closing = cv.morphologyEx(opening,cv.MORPH_CLOSE,kernel, iterations = 4)
+            contours, hierachy = cv.findContours(closing, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
+            # Find the index of the largest contour
+            if len(contours) <1:
+                pass
+            else:
+                areas = [cv.contourArea(c) for c in contours]
+                max_index = np.argmax(areas)
+                cnt=contours[max_index]
+                # print(cv.contourArea(cnt))
+                if cv.contourArea(cnt) > 500:
+                    x,y,w,h = cv.boundingRect(cnt)
+                    cv.rectangle(img,(x,y),(x+w,y+h),0,2)
+            cv.imshow("closed mask", closing)
+            cv.waitKey(1)
+            cv.imshow("image", img)
+            cv.waitKey(1)
+            time.sleep(0.5)
+        cv.destroyAllWindows()
 
     return
 
