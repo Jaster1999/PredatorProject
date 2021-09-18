@@ -8,6 +8,9 @@ def load_images_from_folder(folder):
     images = []
     for filename in os.listdir(folder):
         img = cv.imread(os.path.join(folder,filename))
+        img =  cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+        if img is not None:
+            images.append(img)
         if img is not None:
             images.append(img)
     return images
@@ -24,9 +27,13 @@ def main():
     sequence = load_images_from_folder(os.path.join(CWD, folderOfSeq, seq))
     mean_frame = np.mean(sequence[0:10], axis=0).astype(np.uint8)
     plt.imshow(mean_frame, cmap="gray")
-    mask = diff_mask(mean_frame, sequence[10], 10)
+    imagenumber = 10
+    thresholdValue = 10
+    mask = diff_mask(mean_frame, sequence[imagenumber], thresholdValue)
     plt.figure()
     plt.imshow(mask, cmap='gray')
+    plt.figure()
+    plt.imshow(sequence[imagenumber], cmap='gray')
     plt.show()
     
     return
