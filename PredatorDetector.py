@@ -49,7 +49,7 @@ def main():
             cv.waitKey(1)
             kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE,(5,5))
             opening = cv.morphologyEx(mask,cv.MORPH_OPEN,kernel, iterations = 1)
-            kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE,(10,10))
+            kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE,(15,15))
             closing = cv.morphologyEx(opening,cv.MORPH_CLOSE,kernel, iterations = 2)
             contours, hierachy = cv.findContours(closing, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
             # Find the index of the largest contour
