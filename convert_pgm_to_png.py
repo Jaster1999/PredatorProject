@@ -1,7 +1,6 @@
 import cv2 as cv
-import numpy as np
-import matplotlib.pyplot as plt
 import os
+
 
 def load_images_from_folder(folder):
     images = []
@@ -17,14 +16,15 @@ def load_images_from_folder(folder):
 def main():
     CWD = os.getcwd()
     folderOfSeq = 'Video sequences for project-20210918'
-    folders = ['Seq1','Seq2','Seq3','Seq4','Seq5','Seq6','Seq7']
+    folders = ['Seq2', 'Seq3', "Seq4", 'Seq5']
     for seq in folders:
         print(seq)
         sequence = load_images_from_folder(os.path.join(CWD, folderOfSeq, seq))
         for imagenumber in range(len(sequence)):
             img = sequence[imagenumber]
-
-
+            imagename = "img"+str(imagenumber)+".png"
+            folder = seq+'png'
+            cv.imwrite(os.path.join(CWD, folderOfSeq, folder, imagename), img)
     return
 
 if __name__ == "__main__":
