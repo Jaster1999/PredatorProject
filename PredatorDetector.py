@@ -115,8 +115,8 @@ def main():
         path = []
         sequence = load_images_from_folder(os.path.join(CWD, folderOfSeq, seq))
         # BKground = np.mean(sequence, axis=0).astype(np.uint8)
-        BKground = np.median(sequence, axis=0).astype(np.uint8)
-        # BKground = np.percentile(sequence, q=75, axis=0).astype(np.uint8) #q=75% etc
+        # BKground = np.median(sequence, axis=0).astype(np.uint8)
+        BKground = np.percentile(sequence, q=75, axis=0).astype(np.uint8) #q=75% etc
         for imagenumber in range(len(sequence)):
             LWRthresholdValue = 10
             UPRthresholdValue = 255
@@ -130,7 +130,7 @@ def main():
             kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE,(5,5))
             opening = cv.morphologyEx(mask,cv.MORPH_OPEN,kernel, iterations = 1)
             kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE,(10,10))
-            closing = cv.morphologyEx(opening,cv.MORPH_CLOSE,kernel, iterations = 1)
+            closing = cv.morphologyEx(opening,cv.MORPH_CLOSE,kernel, iterations = 2)
             contours, hierachy = cv.findContours(closing, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
             # Find the index of the largest contour
             if len(contours) <1:
@@ -148,7 +148,7 @@ def main():
                     cX = int(M["m10"] / M["m00"])
                     cY = int(M["m01"] / M["m00"])
                     cv.circle(outImg, (cX, cY), 2, (0,0,0), -1)
-                    seed = (cY, cX)
+                    # seed = (cY, cX)
                     location = (cX, cY)
                     path.append(location)
                     # quantisedImg = quantiseImg(img)
