@@ -4,6 +4,11 @@ import matplotlib.pyplot as plt
 from matplotlib.pyplot import figure
 import os
 
+from skimage import data
+from skimage.util import img_as_ubyte
+from skimage.filters.rank import entropy
+from skimage.morphology import disk
+
 from numpy.lib.type_check import imag
 
 def load_images_from_folder(folder):
@@ -116,6 +121,8 @@ def main():
 
     global img
     img = opening1
+    plt.figure("Entropy plot")
+    plt.imshow(entropy(t_img, disk(7)), cmap="gray")
     plt.figure()
     plt.imshow(edges)
     plt.figure()

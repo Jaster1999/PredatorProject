@@ -12,8 +12,7 @@ def load_images_from_folder(folder):
         #clahe = cv2.createCLAHE(clipLimit=4.0, tileGridSize=(16,16))
         #cl = clahe.apply(img)
         #img = cl
-        smooth = cv2.GaussianBlur(img, (151,151), 0)
-        img = cv2.divide(img, smooth)
+    
         if img is not None:
             images.append(img)
     return images
