@@ -95,30 +95,35 @@ def on_mouse(event, x, y, flags, params):
         clicks.append((y,x))
 
 def main():
-    sequence = load_images_from_folder("C:/Users/larki/Documents/Code/PredatorProject/Video sequences for project-20210914/Seq7")
+    sequence = load_images_from_folder("C:/Users/larki/Documents/Code/PredatorProject/Video sequences for project-20210914/Seq1")
     print(sequence)
-    mean_frame = np.mean(sequence[0:10], axis=0).astype(np.uint8)
+    mean_frame = np.mean(sequence, axis=0).astype(np.uint8)
     plt.imshow(mean_frame, cmap="gray")
     print(mean_frame.shape)
-    mask = (diff_mask(mean_frame, sequence[10], 20)*255).astype(np.uint8)
+    t_img = sequence[40]
+    mask = (diff_mask(mean_frame, t_img, 20)*255).astype(np.uint8)
 
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(5,5))
     opening = cv2.morphologyEx(mask,cv2.MORPH_OPEN,kernel, iterations = 2)
-    closing = cv2.morphologyEx(opening,cv2.MORPH_CLOSE,kernel, iterations = 4)
+    eroded = cv2.erode(opening, kernel, iterations=1)
 
+    edges = cv2.Canny(t_img, 40, 80, apertureSize = 3, L2gradient=False)
 
-    thresh1 = cv2.adaptiveThreshold(sequence[10], 200, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 13, 2)
+    ret, thresh1 = cv2.threshold(t_img, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+    #thresh1 = cv2.adaptiveThreshold(sequence[40], 200, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 13, 2)
     closing1 = cv2.morphologyEx(thresh1,cv2.MORPH_CLOSE, (3, 3), iterations = 4)
     opening1 = cv2.morphologyEx(closing1,cv2.MORPH_OPEN, kernel, iterations = 1)
 
     global img
     img = opening1
     plt.figure()
+    plt.imshow(edges)
+    plt.figure()
     plt.imshow(opening1)
     plt.figure()
-    plt.imshow(opening)
+    plt.imshow(eroded)
     plt.figure()
-    plt.imshow(sequence[10], cmap='gray')
+    plt.imshow(t_img, cmap='gray')
     plt.show()
     global clicks
     clicks = []

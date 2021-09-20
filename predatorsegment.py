@@ -9,6 +9,11 @@ def load_images_from_folder(folder):
     for filename in os.listdir(folder):
         img = cv2.imread(os.path.join(folder,filename))
         img =  cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        #clahe = cv2.createCLAHE(clipLimit=4.0, tileGridSize=(16,16))
+        #cl = clahe.apply(img)
+        #img = cl
+        smooth = cv2.GaussianBlur(img, (151,151), 0)
+        img = cv2.divide(img, smooth)
         if img is not None:
             images.append(img)
     return images
@@ -31,6 +36,13 @@ def main():
     opening = cv2.morphologyEx(mask,cv2.MORPH_OPEN,kernel, iterations = 2)
     closing = cv2.morphologyEx(opening,cv2.MORPH_CLOSE,kernel, iterations = 4)
 
+
+    thresh1 = cv2.adaptiveThreshold(sequence[10], 200, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 13, 2)
+    closing1 = cv2.morphologyEx(thresh1,cv2.MORPH_CLOSE, (3, 3), iterations = 4)
+    opening1 = cv2.morphologyEx(closing1,cv2.MORPH_OPEN, kernel, iterations = 1)
+
+    plt.figure()
+    plt.imshow(opening1)
     plt.figure()
     plt.imshow(opening)
     plt.figure()
