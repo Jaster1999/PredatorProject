@@ -16,6 +16,17 @@ def load_images_from_folder(folder):
     for filename in os.listdir(folder):
         img = cv2.imread(os.path.join(folder,filename))
         img =  cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+        clahe = cv2.createCLAHE(clipLimit=4.0, tileGridSize=(16,16))
+        cl = clahe.apply(img)
+        img = cl
+        '''hist,bins = np.histogram(img.flatten(),256,[0,256])
+        cdf = hist.cumsum()
+        cdf_m = np.ma.masked_equal(cdf,0)
+        cdf_m = (cdf_m - cdf_m.min())*255/(cdf_m.max()-cdf_m.min())
+        cdf = np.ma.filled(cdf_m,0).astype('uint8')
+        img = cdf[img]'''
+
         if img is not None:
             images.append(img)
     return images
@@ -100,29 +111,39 @@ def on_mouse(event, x, y, flags, params):
         clicks.append((y,x))
 
 def main():
-    sequence = load_images_from_folder("C:/Users/larki/Documents/Code/PredatorProject/Video sequences for project-20210914/Seq1")
+    sequence = load_images_from_folder("C:/Users/larki/Documents/Code/PredatorProject/Video sequences for project-20210914/Seq7")
     print(sequence)
     mean_frame = np.mean(sequence, axis=0).astype(np.uint8)
     plt.imshow(mean_frame, cmap="gray")
     print(mean_frame.shape)
-    t_img = sequence[40]
+    t_img = sequence[10]
     mask = (diff_mask(mean_frame, t_img, 20)*255).astype(np.uint8)
 
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(5,5))
     opening = cv2.morphologyEx(mask,cv2.MORPH_OPEN,kernel, iterations = 2)
     eroded = cv2.erode(opening, kernel, iterations=1)
 
-    edges = cv2.Canny(t_img, 40, 80, apertureSize = 3, L2gradient=False)
+    edges = cv2.Canny(t_img, 150, 200, apertureSize = 3, L2gradient=False)
 
-    ret, thresh1 = cv2.threshold(t_img, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
-    #thresh1 = cv2.adaptiveThreshold(sequence[40], 200, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 13, 2)
-    closing1 = cv2.morphologyEx(thresh1,cv2.MORPH_CLOSE, (3, 3), iterations = 4)
+    #ret, thresh1 = cv2.threshold(t_img, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+    thresh1 = cv2.adaptiveThreshold(t_img, 200, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 13, 2)
+    closing1 = cv2.morphologyEx(thresh1,cv2.MORPH_CLOSE, (3,3), iterations = 3)
     opening1 = cv2.morphologyEx(closing1,cv2.MORPH_OPEN, kernel, iterations = 1)
 
+    tex1 = np.array([[-1, -2, -1],
+            [2, 4, 2],
+            [-1, -2, -1]])
+    tex2 = np.array([[-1, 2, -1],
+            [-2, 4, -2],
+            [-1, 2, -1]])
+
+    ret, thresh2 = cv2.threshold(cv2.absdiff(cv2.filter2D(t_img,  ddepth=-1, kernel=tex1), cv2.filter2D(t_img,  ddepth=-1, kernel=tex2)), 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
     global img
     img = opening1
+    plt.figure("Manual texture1")
+    plt.imshow(thresh2)
     plt.figure("Entropy plot")
-    plt.imshow(entropy(t_img, disk(7)), cmap="gray")
+    plt.imshow(entropy(t_img, disk(3)), cmap="gray")
     plt.figure()
     plt.imshow(edges)
     plt.figure()
