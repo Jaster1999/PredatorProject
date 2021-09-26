@@ -37,13 +37,14 @@ def main():
         AspectTotal = []
         ConvexityTotal = []
         path = []
+        animal = []
         sequence = load_images_from_folder(os.path.join(CWD, folderOfSeq, seq))
         # BKground = np.mean(sequence, axis=0).astype(np.uint8)
         # BKground = np.median(sequence, axis=0).astype(np.uint8)
         BKground = np.percentile(sequence, q=75, axis=0).astype(np.uint8) #q=75% etc
         for imagenumber in range(len(sequence)):
             if seq == "Seq1":
-                LWRthresholdValue = 25
+                LWRthresholdValue = 40
             else:
                 LWRthresholdValue = 10
             UPRthresholdValue = 255
@@ -54,11 +55,12 @@ def main():
             cv.imshow("mask", mask)
             # cv.imshow("image", img)
             cv.waitKey(1)
-            
+            kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE,(3,3))
+            closed = cv.morphologyEx(mask,cv.MORPH_CLOSE,kernel, iterations = 1)
             kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE,(5,5))
-            opening = cv.morphologyEx(mask,cv.MORPH_OPEN,kernel, iterations = 1)
-            kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE,(15,15))
-            closing = cv.morphologyEx(opening,cv.MORPH_CLOSE,kernel, iterations = 2)
+            opening = cv.morphologyEx(closed,cv.MORPH_OPEN,kernel, iterations = 1)
+            kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE,(30,30))
+            closing = cv.morphologyEx(opening,cv.MORPH_CLOSE,kernel, iterations = 1)
             
             contours, hierachy = cv.findContours(closing, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
             # Find the index of the largest contour
@@ -104,6 +106,9 @@ def main():
                     Convexity = ConvHullPerim/perimeter
                     ConvexityTotal.append(Convexity)
                     AspectTotal.append(aspectRatio)
+                    #Stoat = 1, Rat = 2, Hedgehog = 3
+                    if aspectRatio < 1.5:
+                        animal.append(3)
             if len(path) > 1:
                 for point in path:
                     cv.circle(outImg, (point[0], point[1]), 3, (0,0,255), -1)
@@ -113,9 +118,6 @@ def main():
             cv.imshow("Out Image", outImg)
             cv.waitKey(1)
             time.sleep(0.1)
-        print(f"average area: {np.mean(areaTotal)}")
-        print(f"average Convexity: {np.mean(ConvexityTotal)}")
-        print(f"average Aspect Ratio: {np.mean(AspectTotal)}")
         print(f"Median area: {np.median(areaTotal)}")
         print(f"Median Convexity: {np.median(ConvexityTotal)}")
         print(f"Median Aspect Ratio: {np.median(AspectTotal)}")
