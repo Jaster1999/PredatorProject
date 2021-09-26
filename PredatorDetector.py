@@ -20,7 +20,13 @@ def load_images_from_folder(folder):
     return images
     
 def diff_mask(img1, img2, LWRthreshold, UPRthreshold):
-    diff = cv.absdiff(img1, img2)
+    avgPx = np.mean(img1)
+    if avgPx > 80:
+        # it is daytime, look for bright things
+        diff = cv.subtract(img2, img1)
+    else:
+        #it is nighttime, look for any changes
+        diff = cv.absdiff(img1, img2)
     cv.imshow("diff", diff)
     cv.waitKey(1)
     mask = cv.inRange(diff, LWRthreshold, UPRthreshold)
@@ -44,7 +50,7 @@ def main():
         BKground = np.percentile(sequence, q=75, axis=0).astype(np.uint8) #q=75% etc
         for imagenumber in range(len(sequence)):
             if seq == "Seq1":
-                LWRthresholdValue = 40
+                LWRthresholdValue = 10
             else:
                 LWRthresholdValue = 10
             UPRthresholdValue = 255
@@ -109,6 +115,10 @@ def main():
                     #Stoat = 1, Rat = 2, Hedgehog = 3
                     if aspectRatio < 1.5:
                         animal.append(3)
+                    elif aspectRatio >=1.5 and aspectRatio <2.7:
+                        animal.append(2)
+                    elif aspectRatio >=2.7:
+                        animal.append(1)
             if len(path) > 1:
                 for point in path:
                     cv.circle(outImg, (point[0], point[1]), 3, (0,0,255), -1)
@@ -117,10 +127,15 @@ def main():
             cv.imshow("closed mask", closing)
             cv.imshow("Out Image", outImg)
             cv.waitKey(1)
-            time.sleep(0.1)
+            time.sleep(0.05)
+            # cv.waitKey()
+        if len(path) < 3:
+            #animal not sufficiently detected
+            animal = [0]
         print(f"Median area: {np.median(areaTotal)}")
         print(f"Median Convexity: {np.median(ConvexityTotal)}")
         print(f"Median Aspect Ratio: {np.median(AspectTotal)}")
+        print(f"Animal in Seq is: {np.median(animal)}")
         cv.destroyAllWindows()
 
     return
