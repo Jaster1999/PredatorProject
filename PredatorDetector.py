@@ -121,7 +121,6 @@ def main():
                     if aspectRatio < 1.5:
                         animal.append(3)
                     elif aspectRatio >=1.5 and aspectRatio <2.8:
-                        #it is hard to distingush rat and stoat based on aspect ratio
                         animal.append(2)
                     elif aspectRatio >=2.8:
                         # greater than this aspect is definitely a stoat
@@ -160,7 +159,7 @@ def main():
             text = "Hedgehog"
         else:
             text = "Unknown"
-        print("Animal in Seq is: " + text)
+        print("Animal in"+ seq + "is: " + text)
         #put some information on the output image
         outImg = cv.putText(outImg, "Animal Found: "+text, (10,30), cv.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2, cv.LINE_AA)
         cv.imshow("Out Image", outImg)
