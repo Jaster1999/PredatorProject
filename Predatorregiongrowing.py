@@ -111,7 +111,7 @@ def on_mouse(event, x, y, flags, params):
         clicks.append((y,x))
 
 def main():
-    sequence = load_images_from_folder("C:/Users/larki/Documents/Code/PredatorProject/Video sequences for project-20210914/Seq7")
+    sequence = load_images_from_folder("C:/Users/larki/Documents/Code/PredatorProject/Video sequences for project-20210914/Seq6")
     print(sequence)
     mean_frame = np.mean(sequence, axis=0).astype(np.uint8)
     plt.imshow(mean_frame, cmap="gray")
@@ -129,13 +129,15 @@ def main():
     thresh1 = cv2.adaptiveThreshold(t_img, 200, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 13, 2)
     closing1 = cv2.morphologyEx(thresh1,cv2.MORPH_CLOSE, (3,3), iterations = 3)
     opening1 = cv2.morphologyEx(closing1,cv2.MORPH_OPEN, kernel, iterations = 1)
-
+ 
     tex1 = np.array([[-1, -2, -1],
-            [2, 4, 2],
-            [-1, -2, -1]])
+                     [2, 4, 2],
+                     [-1, -2, -1]])
     tex2 = np.array([[-1, 2, -1],
-            [-2, 4, -2],
-            [-1, 2, -1]])
+                     [-2, 4, -2],
+                     [-1, 2, -1]])
+    # https://scikit-image.org/docs/dev/auto_examples/features_detection/plot_gabor.html
+    # https://ww2.mathworks.cn/help/images/texture-segmentation-using-gabor-filters.html
 
     ret, thresh2 = cv2.threshold(cv2.absdiff(cv2.filter2D(t_img,  ddepth=-1, kernel=tex1), cv2.filter2D(t_img,  ddepth=-1, kernel=tex2)), 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
     global img
