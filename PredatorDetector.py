@@ -134,7 +134,7 @@ def main():
             cv.imshow("closed mask", closing)
             cv.imshow("Out Image", outImg)
             cv.waitKey(1)
-            time.sleep(0.05)
+            time.sleep(0.25)
             # cv.waitKey()
         #after looping through every image in the sequence, Check to see if an animal was successfully 
         if len(path) < 5:
@@ -159,7 +159,7 @@ def main():
             text = "Hedgehog"
         else:
             text = "Unknown"
-        print("Animal in"+ seq + "is: " + text)
+        print("Animal in "+ seq + " is: " + text)
         #put some information on the output image
         outImg = cv.putText(outImg, "Animal Found: "+text, (10,30), cv.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2, cv.LINE_AA)
         cv.imshow("Out Image", outImg)
